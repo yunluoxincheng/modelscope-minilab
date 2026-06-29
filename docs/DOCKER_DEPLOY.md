@@ -10,8 +10,10 @@
 ```bash
 mkdir -p ~/minilab && cd ~/minilab
 
-# 拉部署脚本
-curl -fsSL https://raw.githubusercontent.com/yunluoxincheng/modelscope-minilab/main/deploy.sh -o deploy.sh
+# 拉部署脚本（国内服务器建议用 jsDelivr 源；raw.githubusercontent.com 常被墙）
+curl -fsSL https://cdn.jsdelivr.net/gh/yunluoxincheng/modelscope-minilab@main/deploy.sh -o deploy.sh
+chmod +x deploy.sh          # 必做！curl 下载不带执行位，不 chmod 会报 sudo: ./deploy.sh: command not found
+head -1 deploy.sh           # 验证下载对了：第一行必须是 #!/usr/bin/env bash
 
 # 把你填好密钥的 .env 上传到这里（JWT_SECRET / WECHAT_APP_ID / WECHAT_APP_SECRET 等）
 #   scp .env user@server:~/minilab/
