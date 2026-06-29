@@ -22,7 +22,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-REPO_RAW="https://raw.githubusercontent.com/yunluoxincheng/modelscope-minilab/main"
+# 自动拉取 docker-compose.yml 的源；默认用 jsDelivr CDN（国内服务器比 raw.githubusercontent.com 稳定）。
+# 需要时可覆盖：REPO_RAW=https://raw.githubusercontent.com/yunluoxincheng/modelscope-minilab/main ./deploy.sh
+REPO_RAW="${REPO_RAW:-https://cdn.jsdelivr.net/gh/yunluoxincheng/modelscope-minilab@main}"
 HEALTH_URL="http://127.0.0.1:8000/api/health"
 
 # ---------- 输出 ----------
