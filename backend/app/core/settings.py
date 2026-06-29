@@ -90,8 +90,11 @@ class Settings(BaseSettings):
         if not self.service_window_start or not self.service_window_end:
             return True
         import datetime as _dt
+        from datetime import timezone, timedelta
 
-        now = _dt.datetime.now().time()
+        # 固定 UTC+8 取北京时间，不依赖容器 tzdata（slim 镜像未装 zoneinfo 数据库，
+        # ENV TZ=Asia/Shanghai 实际不生效，否则会按 UTC 判断导致窗口错位）。
+        now = _dt.datetime.now(timezone(timedelta(hours=8))).time()
         start = _dt.datetime.strptime(self.service_window_start, "%H:%M").time()
         end = _dt.datetime.strptime(self.service_window_end, "%H:%M").time()
         return start <= now <= end
