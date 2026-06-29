@@ -1,0 +1,5 @@
+.desc {
+  margin-top: 16rpx;
+  color: #334155;
+  line-height: 1.7;
+}

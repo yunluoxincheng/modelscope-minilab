@@ -1,0 +1,21 @@
+<!--pages/about/about.wxml-->
+<view class="container">
+  <view class="card">
+    <view class="title">智模工坊</view>
+    <view class="muted">ModelScope MiniLab · v{{version}}</view>
+    <view class="desc">一个个人作品集风格的 AI 小模型展示小程序。每个模型都来自本人的训练实践，目前首个可用模型是猫狗图像二分类。</view>
+  </view>
+
+  <view class="card">
+    <view class="title">技术栈</view>
+    <view class="muted">前端：微信原生小程序</view>
+    <view class="muted">后端：Python FastAPI + PyTorch</view>
+    <view class="muted">数据库：MySQL 8.x（开发可用 SQLite）</view>
+    <view class="muted">限流：Redis</view>
+  </view>
+
+  <view class="card">
+    <view class="title">开放时间</view>
+    <view class="muted">服务通常在每日 10:00 - 18:00 开放，其他时段可能停机维护。</view>
+  </view>
+</view>

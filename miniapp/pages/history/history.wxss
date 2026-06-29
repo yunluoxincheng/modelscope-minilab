@@ -1,0 +1,17 @@
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8rpx 0;
+}
+
+.row__label {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.center {
+  text-align: center;
+  padding: 16rpx;
+}

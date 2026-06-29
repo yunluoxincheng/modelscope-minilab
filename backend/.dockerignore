@@ -1,0 +1,33 @@
+# 虚拟环境
+.venv/
+venv/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# 本地配置与数据（绝不能打进镜像）
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+dev.db
+
+# 测试（生产镜像不需要）
+tests/
+
+# IDE / 系统
+.vscode/
+.idea/
+.DS_Store
+
+# 文档与日志
+docs/
+*.log

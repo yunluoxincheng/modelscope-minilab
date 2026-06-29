@@ -1,0 +1,72 @@
+name: build-and-push-docker
+
+# 构建多架构（amd64 + arm64）CPU 推理镜像并推送到 Docker Hub。
+# 需要在仓库 Settings -> Secrets 配置：
+#   DOCKERHUB_USERNAME  Docker Hub 用户名（yunluoxincheng）
+#   DOCKERHUB_TOKEN     Docker Hub Access Token（在 hub.docker.com -> Account Settings -> Security 生成，只勾 read/write/push 权限）
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/docker-publish.yml'
+  workflow_dispatch:
+    inputs:
+      extra_tag:
+        description: '额外镜像 tag（如 v1.0.1，留空则不加）'
+        required: false
+        default: ''
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU（多架构模拟）
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Generate image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend
+          tags: |
+            type=raw,value=latest
+            type=raw,value=1.0.0
+            type=raw,value=${{ github.event.inputs.extra_tag }},enable=${{ github.event.inputs.extra_tag != '' }}
+
+      - name: Build and push（amd64 + arm64）
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        run: |
+          echo "### Docker 镜像已推送" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "镜像：\`${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend\`" >> $GITHUB_STEP_SUMMARY
+          echo "架构：linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
+          echo "Tags：latest, 1.0.0" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "服务器拉取：\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend:1.0.0" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,36 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <view class="title">智模工坊</view>
+  <view class="subtitle">ModelScope MiniLab · 试试我训练的 AI 小模型</view>
+
+  <block wx:if="{{loading}}">
+    <view class="card muted">模型加载中…</view>
+  </block>
+
+  <block wx:elif="{{error}}">
+    <view class="card">
+      <view class="error-text">{{error}}</view>
+    </view>
+  </block>
+
+  <block wx:elif="{{models.length === 0}}">
+    <view class="empty">暂无可用模型</view>
+  </block>
+
+  <block wx:else>
+    <view
+      class="model-card card"
+      wx:for="{{models}}"
+      wx:key="model_id"
+      data-id="{{item.model_id}}"
+      bindtap="onTapModel"
+    >
+      <view class="model-card__head">
+        <text class="model-card__name">{{item.name}}</text>
+        <text class="tag" wx:if="{{item.task_type === 'image_classification'}}">图像分类</text>
+      </view>
+      <view class="model-card__en muted">{{item.name_en}}</view>
+      <view class="model-card__desc muted">{{item.description}}</view>
+    </view>
+  </block>
+</view>

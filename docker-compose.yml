@@ -1,0 +1,78 @@
+# ModelScope MiniLab / 智模工坊 —— 生产/服务器部署
+#
+# 用法：
+#   1. 把本文件和 .env 放到服务器同一目录（不需要源码，镜像从 Docker Hub 拉）
+#   2. cp docker-compose.env.example .env  并填好真实密钥
+#   3. docker compose up -d
+#   4. 查看：docker compose logs -f backend
+#
+# 默认启用 backend + redis，数据库用 SQLite（落到卷里，重启不丢）。
+# 想用 MySQL：docker compose --profile mysql up -d，并按 .env 注释改 DATABASE_URL。
+
+services:
+  backend:
+    image: yunluoxincheng/modelscope-minilab-backend:1.0.0
+    container_name: minilab-backend
+    env_file:
+      - ./.env
+    environment:
+      # 覆盖镜像里的默认值，强制连到本 compose 网络里的 redis。
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    volumes:
+      - minilab-data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+        required: false   # 没启用 mysql profile 时跳过
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 40s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: minilab-redis
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  mysql:
+    profiles: ["mysql"]
+    image: mysql:8.0
+    container_name: minilab-mysql
+    env_file:
+      - ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-change-me}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-minilab}
+      - MYSQL_USER=${MYSQL_USER:-minilab}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-change-me}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-change-me}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  minilab-data:
+  redis-data:
+  mysql-data:

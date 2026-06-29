@@ -1,0 +1,41 @@
+<!--pages/model-detail/model-detail.wxml-->
+<view class="container">
+  <block wx:if="{{loading}}">
+    <view class="card muted">加载中…</view>
+  </block>
+  <block wx:elif="{{model}}">
+    <view class="card">
+      <view class="title">{{model.name}}</view>
+      <view class="muted">{{model.name_en}}</view>
+      <view class="desc">{{model.description}}</view>
+      <view class="meta">
+        <text class="tag">输入：{{model.input_type === 'image' ? '图片' : model.input_type}}</text>
+        <text class="tag" wx:if="{{model.task_type === 'image_classification'}}">图像分类</text>
+        <text class="muted">支持最大 {{model.max_upload_mb}}MB</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view wx:if="{{imageSrc}}" class="preview">
+        <image src="{{imageSrc}}" mode="aspectFit" />
+      </view>
+
+      <view wx:if="{{predicting}}" class="muted center">识别中…</view>
+
+      <view wx:if="{{result}}" class="result">
+        <view class="result__label">{{result.label_cn}}</view>
+        <view class="muted">置信度 {{result.confidence}}</view>
+      </view>
+
+      <view wx:if="{{error}}" class="error-text center">{{error}}</view>
+
+      <button class="primary-btn" bindtap="onChooseImage" disabled="{{predicting}}">
+        {{predicting ? '识别中' : '拍照 / 选择图片'}}
+      </button>
+      <view class="ghost-btn" style="margin-top: 16rpx;" bindtap="goHistory">查看历史记录</view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="empty">模型不存在或暂不可用</view>
+  </block>
+</view>

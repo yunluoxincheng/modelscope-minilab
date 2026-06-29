@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# SQLite dev databases
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# WeChat dev tools
+miniapp/miniprogram_npm/
+miniapp/node_modules/
+
+# Build artifacts
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/

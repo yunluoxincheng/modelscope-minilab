@@ -1,0 +1,11 @@
+<!--pages/login/login.wxml-->
+<view class="container">
+  <view class="card">
+    <view class="title">登录智模工坊</view>
+    <view class="muted">使用微信账号一键登录，仅用于保存你自己的识别历史。</view>
+    <view wx:if="{{error}}" class="error-text">{{error}}</view>
+    <button class="primary-btn" bindtap="onLogin" disabled="{{loading}}" loading="{{loading}}">
+      {{loading ? '登录中…' : '微信一键登录'}}
+    </button>
+  </view>
+</view>
