@@ -1,0 +1,12 @@
+# 默认文本文件用 LF 换行，避免 Windows 上 CRLF 导致 shell 脚本在 Linux 服务器执行报错
+* text=auto eol=lf
+
+# 显式确保脚本类文件为 LF
+*.sh   text eol=lf
+*.bash text eol=lf
+
+# 二进制模型权重，不做换行/差异处理
+*.pth  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
