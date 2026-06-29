@@ -3,6 +3,35 @@
 镜像已由 GitHub Actions 构建并推送到 Docker Hub，多架构（amd64 + arm64）：
 `yunluoxincheng/modelscope-minilab-backend`，tags：`1.0.0` / `latest`。
 
+## 一键部署（推荐）
+
+用仓库自带的 `deploy.sh`：自动检查环境 → 校验 `.env` → 拉镜像 → 启动 → 健康检查。服务器上**只需脚本 + `.env` 两个文件**（`docker-compose.yml` 缺失时会自动从 GitHub 拉）。
+
+```bash
+mkdir -p ~/minilab && cd ~/minilab
+
+# 拉部署脚本
+curl -fsSL https://raw.githubusercontent.com/yunluoxincheng/modelscope-minilab/main/deploy.sh -o deploy.sh
+
+# 把你填好密钥的 .env 上传到这里（JWT_SECRET / WECHAT_APP_ID / WECHAT_APP_SECRET 等）
+#   scp .env user@server:~/minilab/
+
+./deploy.sh        # 首次部署；跑完会自检 /api/health 并打印 HTTPS / 合法域名提醒
+```
+
+常用命令：
+
+| 命令 | 作用 |
+|---|---|
+| `./deploy.sh` | 部署/更新（拉镜像 + 启动 + 健康检查） |
+| `./deploy.sh mysql` | 同时启用 MySQL |
+| `./deploy.sh status` / `logs` / `restart` / `down` / `health` | 运维 |
+| `./deploy.sh --no-pull` | 用本地已有镜像（离线 / 锁版本） |
+
+脚本不会打印任何密钥值；生产环境（`ENV=prod`）下若 `.env` 里 `WECHAT_AUTH_MOCK=true` 会**拒绝启动**。
+
+> 下面是不用脚本的手动分步说明。
+
 ## 0. 前置条件
 
 服务器上需要：

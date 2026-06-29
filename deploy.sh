@@ -12,6 +12,10 @@
 #   ./deploy.sh down        停止并移除容器（数据卷保留）
 #   ./deploy.sh health      只做健康检查
 #   ./deploy.sh help        帮助
+#
+# 可附加 --no-pull 跳过镜像拉取（用本地已有镜像，适合离线/锁版本）：
+#   ./deploy.sh --no-pull
+#   ./deploy.sh mysql --no-pull
 # ============================================================================
 set -euo pipefail
 
@@ -81,9 +85,9 @@ preflight() {
   ensure_files
 
   info "校验 .env 关键变量（不打印值）"
-  assert_nonempty        JWT_SECRET       "JWT 密钥"
-  assert_not_placeholder JWT_SECRET       "please-replace-with-openssl-rand-hex-32"
-  assert_nonempty        WECHAT_APP_ID    "微信 AppID"
+  assert_nonempty        JWT_SECRET        "JWT 密钥"
+  assert_not_placeholder JWT_SECRET        "please-replace-with-openssl-rand-hex-32"
+  assert_nonempty        WECHAT_APP_ID     "微信 AppID"
   assert_nonempty        WECHAT_APP_SECRET "微信 AppSecret"
 
   if [[ "$(env_value ENV)" == "prod" && "$(env_value WECHAT_AUTH_MOCK)" == "true" ]]; then
@@ -108,16 +112,20 @@ wait_health() {
 cmd_deploy() {
   local profile="${1:-}"
   preflight
-  info "拉取镜像（自动匹配服务器架构）"
-  if [[ -n "$profile" ]]; then
-    "${COMPOSE[@]}" --profile "$profile" pull
-    info "启动 backend + redis + $profile"
-    "${COMPOSE[@]}" --profile "$profile" up -d --remove-orphans
+
+  local up_args=()
+  if [[ -n "$profile" ]]; then up_args+=(--profile "$profile"); fi
+
+  if [[ "${NO_PULL:-0}" == "1" ]]; then
+    warn "跳过镜像拉取（--no-pull），使用本地已有镜像"
   else
-    "${COMPOSE[@]}" pull
-    info "启动 backend + redis"
-    "${COMPOSE[@]}" up -d --remove-orphans
+    info "拉取镜像（自动匹配服务器架构）"
+    "${COMPOSE[@]}" "${up_args[@]}" pull
   fi
+
+  info "启动 backend + redis${profile:+ + $profile}"
+  "${COMPOSE[@]}" "${up_args[@]}" up -d --remove-orphans
+
   if ! wait_health; then
     die "后端 60s 内未就绪，请查看日志：${COMPOSE[*]} logs backend"
   fi
@@ -137,10 +145,24 @@ cmd_restart() { detect_compose; warn "重启服务"; "${COMPOSE[@]}" restart; }
 cmd_down()    { detect_compose; warn "停止并移除容器（数据卷保留）"; "${COMPOSE[@]}" down; }
 cmd_health()  { detect_compose; if ! wait_health; then die "健康检查未通过"; fi; }
 
-usage() { sed -n '3,15p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '3,16p' "$0" | sed 's/^# \{0,1\}//'; }
 
+NO_PULL=0
 main() {
-  case "${1:-up}" in
+  local cmd="${1:-up}"
+  case "$cmd" in
+    up|deploy|mysql|status|ps|logs|restart|down|stop|health|help|-h|--help) shift || true ;;
+    --no-pull) cmd="up"; NO_PULL=1; shift || true ;;
+    *) die "未知命令：$cmd（用 ./deploy.sh help 查看用法）" ;;
+  esac
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-pull) NO_PULL=1 ;;
+      *) die "未知参数：$1（用 ./deploy.sh help 查看用法）" ;;
+    esac
+    shift
+  done
+  case "$cmd" in
     up|deploy) cmd_deploy "" ;;
     mysql)     cmd_deploy "mysql" ;;
     status|ps) cmd_status ;;
@@ -149,7 +171,6 @@ main() {
     down|stop) cmd_down ;;
     health)    cmd_health ;;
     help|-h|--help) usage ;;
-    *) die "未知命令：$1（用 ./deploy.sh help 查看用法）" ;;
   esac
 }
 
