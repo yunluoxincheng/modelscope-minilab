@@ -4,8 +4,11 @@
 
 1. 打开微信开发者工具。
 2. 选择「导入项目」，目录选择 `miniapp/`。
-3. AppID 填写你的微信小程序 AppID。
-4. 修改 `miniapp/project.config.json` 的 `appid` 字段为正式 AppID。
+3. 复制配置模板（含本地 AppID 的真实 `project.config.json` 已被 `.gitignore` 忽略，不会提交）：
+   ```bash
+   cp miniapp/project.config.example.json miniapp/project.config.json
+   ```
+4. 把 `miniapp/project.config.json` 里的 `appid` 填成你的微信小程序 AppID（直接在微信开发者工具导入项目时填也行）。
 
 ## 2. 修改后端地址
 

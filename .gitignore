@@ -19,6 +19,8 @@ venv/
 # WeChat dev tools
 miniapp/miniprogram_npm/
 miniapp/node_modules/
+# project.config.json 含本地 AppID 等机器相关配置，用 project.config.example.json 作模板
+miniapp/project.config.json
 
 # Build artifacts
 *.egg-info/

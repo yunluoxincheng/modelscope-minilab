@@ -2,7 +2,7 @@
   "miniprogramRoot": "./",
   "projectname": "modelscope-minilab",
   "description": "智模工坊 / ModelScope MiniLab",
-  "appid": "wx75fdf5fd30a795d3",
+  "appid": "",
   "setting": {
     "urlCheck": false,
     "es6": true,
