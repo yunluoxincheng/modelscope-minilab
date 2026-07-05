@@ -1,7 +1,7 @@
 # 服务器部署（docker-compose）
 
 镜像已由 GitHub Actions 构建并推送到 Docker Hub，多架构（amd64 + arm64）：
-`yunluoxincheng/modelscope-minilab-backend`，tags：`1.0.0` / `latest`。
+`yunluoxincheng/modelscope-minilab-backend:latest`。
 
 ## 一键部署（推荐）
 
@@ -144,7 +144,7 @@ DATABASE_URL=mysql+pymysql://minilab:你的MYSQL_PASSWORD@mysql:3306/minilab?cha
 
 ## 7. 更新镜像
 
-后续代码改动 push 到 GitHub，Actions 自动构建新镜像（`:latest` + `:1.0.0`）。服务器更新：
+后续代码改动 push 到 GitHub，Actions 自动构建新镜像（`:latest`）。服务器更新：
 
 ```bash
 docker compose pull

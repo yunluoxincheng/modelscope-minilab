@@ -11,7 +11,7 @@
 
 services:
   backend:
-    image: yunluoxincheng/modelscope-minilab-backend:1.0.0
+    image: yunluoxincheng/modelscope-minilab-backend:latest
     container_name: minilab-backend
     env_file:
       - ./.env

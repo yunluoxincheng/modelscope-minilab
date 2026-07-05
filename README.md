@@ -54,7 +54,7 @@ uvicorn app.main:app --reload --port 8000
 | 项 | 值 |
 |---|---|
 | GitHub 仓库 | https://github.com/yunluoxincheng/modelscope-minilab |
-| Docker 镜像 | `yunluoxincheng/modelscope-minilab-backend`（tags：`1.0.0` / `latest`） |
+| Docker 镜像 | `yunluoxincheng/modelscope-minilab-backend:latest` |
 | 支持架构 | linux/amd64 + linux/arm64（自动匹配服务器架构） |
 | CI 触发 | push 到 `main` 自动重建；也可在 Actions 页手动 `workflow_dispatch` |
 

@@ -44,7 +44,6 @@ jobs:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend
           tags: |
             type=raw,value=latest
-            type=raw,value=1.0.0
             type=raw,value=${{ github.event.inputs.extra_tag }},enable=${{ github.event.inputs.extra_tag != '' }}
 
       - name: Build and push（amd64 + arm64）
@@ -65,8 +64,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "镜像：\`${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend\`" >> $GITHUB_STEP_SUMMARY
           echo "架构：linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
-          echo "Tags：latest, 1.0.0" >> $GITHUB_STEP_SUMMARY
+          echo "Tags：latest" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "服务器拉取：\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend:1.0.0" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/modelscope-minilab-backend:latest" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
