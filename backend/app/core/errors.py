@@ -1,6 +1,7 @@
 """Stable error response shape and unified exception handling."""
 from __future__ import annotations
 
+import logging
 import uuid
 from typing import Any, Dict, Optional
 
@@ -8,6 +9,8 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+log = logging.getLogger(__name__)
 
 
 class ApiError(Exception):
@@ -151,6 +154,11 @@ def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def _handle_unhandled(_: Request, exc: Exception):
         rid = new_request_id()
+        log.error(
+            "unhandled exception request_id=%s",
+            rid,
+            exc_info=(type(exc), exc, exc.__traceback__),
+        )
         return JSONResponse(
             status_code=500,
             content=error_payload("INTERNAL_ERROR", "服务器内部错误，请稍后重试", rid),

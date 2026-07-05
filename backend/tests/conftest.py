@@ -18,6 +18,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 @pytest.fixture(scope="session")
 def settings_env(tmp_path_factory):
     db_file = tmp_path_factory.mktemp("db") / "test.db"
+    os.environ["ENV"] = "dev"
     os.environ["DATABASE_URL"] = f"sqlite:///{db_file.as_posix()}"
     os.environ["REDIS_URL"] = "redis://localhost:6379/15"
     os.environ["WECHAT_AUTH_MOCK"] = "true"

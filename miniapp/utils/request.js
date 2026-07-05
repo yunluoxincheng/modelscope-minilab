@@ -13,6 +13,9 @@ function showError(message) {
 function mapBackendError(body) {
   if (!body || !body.error) return '';
   const code = body.error.code;
+  if (code === 'SERVICE_UNAVAILABLE' && body.error.message) {
+    return body.error.message;
+  }
   const map = {
     MODEL_NOT_FOUND: '模型不存在或暂不可用',
     UNAUTHORIZED: '请先登录',

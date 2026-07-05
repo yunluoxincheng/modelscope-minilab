@@ -7,6 +7,7 @@ from typing import Optional
 import httpx
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.errors import InvalidTokenError, ServiceUnavailableError
 from ..core.rate_limit import get_limiter
@@ -91,22 +92,28 @@ async def wechat_login(
             raise ServiceUnavailableError("微信登录未配置，请联系管理员")
         wechat_data = await _exchange_code_real(payload.code, settings)
 
-    user = upsert_user_by_openid(
-        db,
-        wechat_data["openid"],
-        unionid=wechat_data.get("unionid"),
-        nickname=payload.nickname,
-        avatar_url=payload.avatar_url,
-    )
-    db.commit()
-
-    token = create_token({"uid": user.id, "rid": request_id}, settings)
-    return WechatLoginResponse(
-        token=token,
-        user={
+    try:
+        user = upsert_user_by_openid(
+            db,
+            wechat_data["openid"],
+            unionid=wechat_data.get("unionid"),
+            nickname=payload.nickname,
+            avatar_url=payload.avatar_url,
+        )
+        user_payload = {
             "id": user.id,
             "openid_masked": mask_openid(user.openid),
             "nickname": user.nickname,
             "avatar_url": user.avatar_url,
-        },
+        }
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        log.exception("wechat login db write failed request_id=%s", request_id)
+        raise ServiceUnavailableError("登录服务暂不可用，请稍后重试") from exc
+
+    token = create_token({"uid": user_payload["id"], "rid": request_id}, settings)
+    return WechatLoginResponse(
+        token=token,
+        user=user_payload,
     )
