@@ -49,6 +49,35 @@ def get_user(sess: Session, user_id: int) -> Optional[User]:
     return sess.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
 
 
+def get_user_by_username(sess: Session, username: str) -> Optional[User]:
+    return sess.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+
+def create_password_user(
+    sess: Session,
+    *,
+    username: str,
+    password_hash: str,
+    nickname: Optional[str] = None,
+) -> User:
+    now = _dt.datetime.utcnow()
+    user = User(
+        # openid 非空约束：web 用户用固定前缀占位，与微信 openid 空间天然隔离
+        openid=f"web:{username}",
+        username=username,
+        password_hash=password_hash,
+        nickname=nickname or username,
+        created_at=now,
+        updated_at=now,
+        last_login_at=now,
+    )
+    sess.add(user)
+    sess.flush()
+    return user
+
+
 def insert_prediction(sess: Session, **fields) -> PredictionRecord:
     record = PredictionRecord(**fields)
     sess.add(record)

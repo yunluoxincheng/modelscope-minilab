@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import __service_name__, __version__
 from .api import auth as auth_api
+from .api import auth_password as auth_password_api
 from .api import health as health_api
 from .api import models_api as models_api
 from .api import predictions as predictions_api
@@ -64,6 +65,7 @@ def create_app() -> FastAPI:
     api_prefix = settings.api_prefix
     app.include_router(health_api.router, prefix=api_prefix)
     app.include_router(auth_api.router, prefix=api_prefix)
+    app.include_router(auth_password_api.router, prefix=api_prefix)
     app.include_router(models_api.router, prefix=api_prefix)
     app.include_router(predictions_api.router, prefix=api_prefix)
 

@@ -6,8 +6,12 @@
 #   3. docker compose up -d
 #   4. 查看：docker compose logs -f backend
 #
-# 默认启用 backend + redis，数据库用 SQLite（落到卷里，重启不丢）。
+# 默认启用 backend + web + redis，数据库用 SQLite（落到卷里，重启不丢）。
 # 想用 MySQL：docker compose --profile mysql up -d，并按 .env 注释改 DATABASE_URL。
+#
+# web 容器内已把 /api/ 反代到 backend 服务：宿主机 Nginx 只需一条
+# location / 指向 web（默认 127.0.0.1:8080，可用 WEB_HTTP_PORT 改端口），
+# 前端与接口即同源，无需配置 CORS。
 
 services:
   backend:
@@ -48,6 +52,22 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+
+  web:
+    image: yunluoxincheng/modelscope-minilab-web:latest
+    container_name: minilab-web
+    ports:
+      - "${WEB_HTTP_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
 
   mysql:
     profiles: ["mysql"]

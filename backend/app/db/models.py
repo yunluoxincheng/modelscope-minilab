@@ -34,6 +34,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     openid = Column(String(128), nullable=False, unique=True)
     unionid = Column(String(128), nullable=True)
+    # Web 端用户名+密码登录；微信用户这两列为 NULL。username 唯一性由仓库层查询保证。
+    username = Column(String(64), nullable=True)
+    password_hash = Column(String(255), nullable=True)
     nickname = Column(String(100), nullable=True)
     avatar_url = Column(String(500), nullable=True)
     created_at = Column(DateTime, nullable=False, default=_now)

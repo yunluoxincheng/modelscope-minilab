@@ -4,7 +4,7 @@
 #
 # 服务器上只需把这个脚本和 .env 放在同一目录（docker-compose.yml 缺失时
 # 会自动从 GitHub 拉取）。运行：
-#   ./deploy.sh             部署/更新（拉镜像 + 启动 backend+redis + 健康检查）
+#   ./deploy.sh             部署/更新（拉镜像 + 启动 backend+web+redis + 健康检查）
 #   ./deploy.sh mysql       同上，并额外启用 MySQL（--profile mysql）
 #   ./deploy.sh status      查看容器状态
 #   ./deploy.sh logs        跟随后端日志（Ctrl+C 退出，不影响服务）
@@ -111,6 +111,24 @@ wait_health() {
   return 1
 }
 
+wait_web() {
+  local web_port
+  web_port="$(env_value WEB_HTTP_PORT)"
+  web_port="${web_port:-8080}"
+  local web_url="http://127.0.0.1:${web_port}/"
+  info "等待 Web 前端就绪（$web_url，最多 30s）"
+  local i
+  for i in $(seq 1 15); do
+    if curl -fsS "$web_url" >/dev/null 2>&1; then
+      ok "Web 前端健康检查通过（$web_url）"
+      return 0
+    fi
+    sleep 2
+  done
+  warn "Web 前端未在预期端口响应（WEB_HTTP_PORT=${web_port}），检查：docker compose logs web"
+  return 0   # web 是纯静态 nginx，不阻塞部署流程
+}
+
 cmd_deploy() {
   local profile="${1:-}"
   preflight
@@ -131,12 +149,16 @@ cmd_deploy() {
   if ! wait_health; then
     die "后端 60s 内未就绪，请查看日志：${COMPOSE[*]} logs backend"
   fi
+  wait_web
   echo
   ok "部署完成，容器状态："
   "${COMPOSE[@]}" ps
   echo
   info "上线前别忘了："
-  echo "  1) Nginx + HTTPS 反代到 127.0.0.1:8000（微信小程序必需）"
+  echo "  1) Nginx + HTTPS 反代（微信小程序必需）："
+  echo "     location /api/ → 127.0.0.1:8000   （保持现有配置即可）"
+  echo "     location /    → 127.0.0.1:\${WEB_HTTP_PORT:-8080}   （Web 前端，server 块里加这一条）"
+  echo "     两条都在同一 server 块 = 前端与接口同源，无需 CORS"
   echo "  2) 微信公众平台配置 request / uploadFile 合法域名"
   echo "  3) 小程序 miniapp/utils/config.js 的 API_BASE 改成 https://你的域名/api"
 }

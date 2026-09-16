@@ -1,7 +1,7 @@
 # 服务器部署（docker-compose）
 
 镜像已由 GitHub Actions 构建并推送到 Docker Hub，多架构（amd64 + arm64）：
-`yunluoxincheng/modelscope-minilab-backend:latest`。
+`yunluoxincheng/modelscope-minilab-backend:latest`、`yunluoxincheng/modelscope-minilab-web:latest`。
 
 ## 一键部署（推荐）
 
@@ -96,6 +96,8 @@ curl http://127.0.0.1:8000/api/health
 
 ## 4. Nginx + HTTPS（微信必需）
 
+`docker compose up -d` 会同时启动 backend（8000）与 web 前端（默认 `127.0.0.1:8080`，`.env` 里 `WEB_HTTP_PORT` 可改）。web 容器内部已把 `/api/` 反代给 backend，所以服务器 Nginx 只需按路径分流：
+
 ```nginx
 server {
     listen 443 ssl http2;
@@ -105,8 +107,19 @@ server {
 
     client_max_body_size 6m;        # 略大于 5MB 上传上限
 
+    # 小程序 API（原有配置不变）
     location /api/ {
         proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # Web 前端（新增；web 容器内已把 /api/ 转给 backend，同域无 CORS）
+    location / {
+        proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -116,7 +129,7 @@ server {
 }
 ```
 
-证书用 Let's Encrypt（`certbot --nginx -d your-domain.com`）。
+证书用 Let's Encrypt（`certbot --nginx -d your-domain.com`）。Web 端的部署细节与登录说明见 [docs/WEB_DEPLOY.md](WEB_DEPLOY.md)。
 
 ## 5. 微信合法域名
 

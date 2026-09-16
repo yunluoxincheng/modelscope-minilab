@@ -49,6 +49,41 @@ curl -X POST http://127.0.0.1:8000/api/auth/wechat-login \
 
 > 生产环境 `WECHAT_AUTH_MOCK=false` 时，后端会真的请求微信 `code2Session`，需要正确配置 `WECHAT_APP_ID` / `WECHAT_APP_SECRET`。
 
+## POST /api/auth/register（Web 端注册）
+
+用户名 + 密码注册，成功即登录并返回 token。用户名规则：3–32 位字母/数字/`_`/`-`；密码 6–64 位。
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "alice", "password": "secret123", "nickname": "小明"}'
+```
+
+```json
+{
+  "token": "eyJ...",
+  "user": {
+    "id": 2,
+    "username": "alice",
+    "nickname": "小明",
+    "avatar_url": null,
+    "openid_masked": null
+  }
+}
+```
+
+错误：用户名重复 → 409 `USERNAME_TAKEN`；格式不合法 → 422 `VALIDATION_ERROR`。
+
+## POST /api/auth/login（Web 端登录）
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "alice", "password": "secret123"}'
+```
+
+返回结构与注册相同。用户名不存在或密码错误统一返回 401 `INVALID_CREDENTIALS`（不区分，避免用户名枚举）。签发的 JWT 与微信登录完全等价，调用预测/历史接口方式一致（`Authorization: Bearer <token>`）。
+
 ## GET /api/models
 
 ```bash

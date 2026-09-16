@@ -1,0 +1,211 @@
+/* ============================================================
+   智模工坊 Web —— 「实验室」主题
+   暖黑底 + 细网格 + 信号橙；等宽字体承载数据与标签。
+   不引入外部 webfont：系统等宽/黑体栈，国内与离线环境均可用。
+   ============================================================ */
+
+:root {
+  --lab-bg: #0f1216;
+  --lab-bg-soft: #14181f;
+  --lab-panel: #171c24;
+  --lab-panel-2: #1c222c;
+  --lab-line: rgba(255, 255, 255, 0.08);
+  --lab-line-strong: rgba(255, 255, 255, 0.14);
+  --lab-ink: #e8e6e1;
+  --lab-ink-dim: #a8a49c;
+  --lab-ink-faint: #6f6d68;
+  --lab-accent: #ff6b2c;
+  --lab-accent-soft: rgba(255, 107, 44, 0.14);
+  --lab-accent-line: rgba(255, 107, 44, 0.4);
+  --lab-green: #3fb950;
+  --lab-red: #f85149;
+  --lab-blue: #58a6ff;
+
+  --font-sans: 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei',
+    'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', Consolas,
+    'SF Mono', Menlo, monospace;
+
+  /* 覆盖 Element Plus 主题色（必须挂在 html.dark 上：
+     EP 暗色主题把变量定义在 html.dark，优先级高于 :root） */
+  --el-color-primary: #ff6b2c;
+  --el-color-primary-light-3: #ff8f5e;
+  --el-color-primary-light-5: #ffa985;
+  --el-color-primary-light-7: #ffc4ad;
+  --el-color-primary-light-8: #ffd3c2;
+  --el-color-primary-light-9: #f9e4d9;
+  --el-color-primary-dark-2: #e05212;
+  --el-bg-color: #171c24;
+  --el-bg-color-overlay: #1c222c;
+  --el-bg-color-page: #0f1216;
+  --el-fill-color-blank: #171c24;
+  --el-border-color: rgba(255, 255, 255, 0.14);
+  --el-border-color-light: rgba(255, 255, 255, 0.1);
+  --el-border-color-lighter: rgba(255, 255, 255, 0.08);
+  --el-text-color-primary: #e8e6e1;
+  --el-text-color-regular: #c9c5bd;
+  --el-text-color-secondary: #a8a49c;
+  --el-text-color-placeholder: #6f6d68;
+  --el-fill-color: #1c222c;
+  --el-fill-color-light: #222835;
+  --el-fill-color-lighter: #1c222c;
+}
+
+/* EP 暗色变量挂 html.dark，同选择器下由本文件后加载实现覆盖 */
+html.dark {
+  --el-color-primary: #ff6b2c;
+  --el-color-primary-light-3: #ff8f5e;
+  --el-color-primary-light-5: #ffa985;
+  --el-color-primary-light-7: #ffc4ad;
+  --el-color-primary-light-8: #ffd3c2;
+  --el-color-primary-light-9: #f9e4d9;
+  --el-color-primary-dark-2: #e05212;
+  --el-bg-color: #171c24;
+  --el-bg-color-overlay: #1c222c;
+  --el-bg-color-page: #0f1216;
+  --el-fill-color-blank: #171c24;
+  --el-border-color: rgba(255, 255, 255, 0.14);
+  --el-border-color-light: rgba(255, 255, 255, 0.1);
+  --el-border-color-lighter: rgba(255, 255, 255, 0.08);
+  --el-text-color-primary: #e8e6e1;
+  --el-text-color-regular: #c9c5bd;
+  --el-text-color-secondary: #a8a49c;
+  --el-text-color-placeholder: #6f6d68;
+  --el-fill-color: #1c222c;
+  --el-fill-color-light: #222835;
+  --el-fill-color-lighter: #1c222c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--lab-bg);
+  color: var(--lab-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  /* 细网格 + 顶部暖橙光晕，铺满全页 */
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255, 107, 44, 0.09), transparent),
+    linear-gradient(var(--lab-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--lab-line) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    44px 44px,
+    44px 44px;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+::selection {
+  background: var(--lab-accent);
+  color: #101218;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* 页面容器 */
+.lab-container {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 等宽小标签（眉题） */
+.lab-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lab-accent);
+}
+
+/* 通用面板 */
+.lab-panel {
+  background: linear-gradient(180deg, var(--lab-panel-2), var(--lab-panel));
+  border: 1px solid var(--lab-line);
+  border-radius: 14px;
+}
+
+/* 面板悬浮角标装饰（左上/右下 L 形准星） */
+.lab-panel--crossed {
+  position: relative;
+}
+.lab-panel--crossed::before,
+.lab-panel--crossed::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.lab-panel--crossed::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--lab-accent);
+  border-left: 2px solid var(--lab-accent);
+  border-top-left-radius: 14px;
+}
+.lab-panel--crossed::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--lab-accent);
+  border-right: 2px solid var(--lab-accent);
+  border-bottom-right-radius: 14px;
+}
+
+/* Element Plus 细节校准 */
+.el-button {
+  font-weight: 600;
+}
+
+.el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(255, 255, 255, 0.03);
+  --el-table-row-hover-bg-color: rgba(255, 107, 44, 0.06);
+  --el-table-border-color: var(--lab-line);
+}
+
+.el-card {
+  border-color: var(--lab-line);
+}
+
+/* 页面进入动画 */
+.fade-slide-enter-active {
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+.fade-slide-leave-active {
+  transition: opacity 0.16s ease;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.fade-slide-leave-to {
+  opacity: 0;
+}
+
+/* 上传框内 Element Plus 虚线框配色校准 */
+.el-upload-dragger {
+  --el-border-color: var(--lab-line-strong);
+  --el-border-color-hover: var(--lab-accent);
+}

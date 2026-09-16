@@ -55,6 +55,18 @@ class InvalidTokenError(ApiError):
     message = "登录状态已失效，请重新登录"
 
 
+class InvalidCredentialsError(ApiError):
+    status_code = 401
+    code = "INVALID_CREDENTIALS"
+    message = "用户名或密码错误"
+
+
+class UsernameTakenError(ApiError):
+    status_code = 409
+    code = "USERNAME_TAKEN"
+    message = "用户名已被注册"
+
+
 class FileRequiredError(ApiError):
     status_code = 400
     code = "FILE_REQUIRED"
